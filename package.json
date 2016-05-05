@@ -1,0 +1,40 @@
+{
+  "name": "@emartech/easy-crypto",
+  "description": "Provides simple wrappers around Node's crypto implementation.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --require co-mocha **/*.spec.js",
+    "validate-commit-msg": "validate-commit-msg",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "release": {
+    "verifyConditions": {
+      "path": "./node_modules/semantic-release/dist/lib/plugin-noop.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emartech/node-easy-crypto.git"
+  },
+  "pre-commit": [
+    "validate-commit-msg"
+  ],
+  "keywords": [
+    "crypto",
+    "aes"
+  ],
+  "author": "Emarsys",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/emartech/node-easy-crypto/issues"
+  },
+  "homepage": "https://github.com/emartech/node-easy-crypto#readme",
+  "devDependencies": {
+    "chai": "3.5.0",
+    "co-mocha": "1.1.2",
+    "mocha": "2.4.5",
+    "semantic-release": "4.3.5",
+    "sinon": "1.17.4",
+    "validate-commit-message": "3.0.1"
+  }
+}
