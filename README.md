@@ -6,7 +6,7 @@ To get started just require the lib and create an instance right away.
 
 ```js
 let crypto = require('crypto');
-let ecrypto = require('easy-crypto')();
+let ecrypto = require('@emartech/easy-crypto')();
 
 let password = crypto.randomBytes(24).toString('hex');
 let randomData = crypto.randomBytes(1024).toString('hex');
