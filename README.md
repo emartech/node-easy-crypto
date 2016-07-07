@@ -20,7 +20,7 @@ randomData === decrypted; // true
 ## Interface
 
 ### Initialization
-There aren't too many options you can change and that's on purpose. This small wrapper library is secure by default. You can change two configurations: `passwordSaltSize`, `iterationCount` by passing them to the initialization function as follows:
+There aren't too many options you can change and that is on purpose. This small wrapper library is secure by default. You can change two configurations: `passwordSaltSize`, `iterationCount` by passing them to the initialization function as follows:
 ```js
 let ecrypto = require('easy-crypto')(12, 10000); // parameters are in order: passwordSaltSize, iterationCount
 ```
