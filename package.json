@@ -32,7 +32,7 @@
   "devDependencies": {
     "chai": "3.5.0",
     "co-mocha": "1.1.2",
-    "mocha": "2.4.5",
+    "mocha": "2.5.3",
     "semantic-release": "4.3.5",
     "sinon": "1.17.4",
     "validate-commit-message": "3.0.1"
