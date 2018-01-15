@@ -5,16 +5,26 @@ Provides simple wrappers around Node's crypto implementation.
 To get started just require the lib and create an instance right away.
 
 ```js
-let crypto = require('crypto');
-let ecrypto = require('@emartech/easy-crypto')();
+const crypto = require('crypto');
+const ecrypto = require('@emartech/easy-crypto')();
 
-let password = crypto.randomBytes(24).toString('hex');
-let randomData = crypto.randomBytes(1024).toString('hex');
+const password = crypto.randomBytes(24).toString('hex');
+const randomData = crypto.randomBytes(1024).toString('hex');
 
-let encrypted = yield ecrypto.encryptAsync(password, randomData);
-let decrypted = yield ecrypto.decryptAsync(password, encrypted);
+// Node 7.6 >
+ecrypto.encrypt(password, randomData).then(encrypted => {
+    ecrypto.decrypt(password, encrypted).then(decrypted => {
+        randomData === decrypted; // true
+    });
+});
 
-randomData === decrypted; // true
+// Node 7.6 =<
+async function exampleAsyncFunction() {
+    const encrypted = await ecrypto.encrypt(password, randomData);
+    const decrypted = await ecrypto.decrypt(password, encrypted);
+    randomData === decrypted; //true
+}
+
 ```
 
 ## Interface
@@ -33,11 +43,11 @@ The size of the random data used to generate the encryption key. This value is i
 #### `iterationCount`
 The iteration count used to generate the encryption key.
 
-### encryptAsync(`password`, `plaintext`) -> `ciphertext`
-`password` should be any normal string. It will be used to generate the encryption key. `plaintext` must be `utf-8` encoded string. It will be "converted" to `bytes` and those will be used for the cryptographic operations. The output of this operations is `base64` encoded buffers. This will be used as the input of the `decryptAsync` operation.
+### encrypt(`password`, `plaintext`) -> `ciphertext`
+`password` should be any normal string. It will be used to generate the encryption key. `plaintext` must be `utf-8` encoded string. It will be "converted" to `bytes` and those will be used for the cryptographic operations. The output of this operations is `base64` encoded buffers. This will be used as the input of the `decrypt` operation. This return value is a `Promise`.
 
-### decryptAsync(`password`, `ciphertext`) -> `plaintext`
-`password` should be any normal string. It will be used to generate the encryption key. `ciphertext` must be the output of the `encryptAsync` method. The library is not compatible with any other encryption library out of the box! The output of this operation is the original `utf-8` encoded string.
+### decrypt(`password`, `ciphertext`) -> `plaintext`
+`password` should be any normal string. It will be used to generate the encryption key. `ciphertext` must be the output of the `encrypt` method. The library is not compatible with any other encryption library out of the box! The output of this operation is the original `utf-8` encoded string. This return value is a `Promise`.
 
 ## The crypto parts
 The library is only a thin wrapper of node's own `crypto` module. It uses well known and battle tested encryption techniques. It provides a convenient wrapper around these functions, taking away the details of using encryption correctly. Feel free to explore the source!
