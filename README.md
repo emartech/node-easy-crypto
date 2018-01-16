@@ -34,7 +34,6 @@ There aren't too many options you can change and that is on purpose. This small 
 ```js
 let ecrypto = require('easy-crypto')(12, 10000); // parameters are in order: passwordSaltSize, iterationCount
 ```
-
 The default value for `passwordSaltSize` is 12 `bytes`, for `iterationCount` it is 10k `iterations`.
 
 #### `passwordSaltSize`
