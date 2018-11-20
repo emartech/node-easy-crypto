@@ -39,16 +39,25 @@ const randomData = [
     crypto.randomBytes(1024).toString('hex')
 ];
 
-async function exmaple(password, data) {
+async function example(password, data) {
     const salt = await ecrypto.generateSalt();
     const key = await ecrypto.generateKey(password, salt);
-    const encrypted = await randomData.map(data => ecrypto.encryptWithKey(key, data));
+    const encrypted = await Promise.all(
+        data.map(item => ecrypto.encryptWithKey(key, item))
+    );
 
     const saltFromEncrypted = ecrypto.getSaltFromEncrypted(encrypted[0]);
     const keyForDecryption = await ecrypto.generateKey(password, saltFromEncrypted);
-    const decrypted = await encrypted.map(data => ecrypto.decryptWithKey(key, data));
-    randomData === decrypted; //true
+    const decrypted = await Promise.all(
+        encrypted.map(item => ecrypto.decryptWithKey(keyForDecryption, item))
+    );
+    
+    return data.reduce((allValid, item, index) => {
+        return allValid && item === decrypted[index];
+    }, true);
 }
+
+example(password, randomData);
 
 ```
 
