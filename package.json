@@ -3,7 +3,7 @@
   "description": "Provides simple wrappers around Node's crypto implementation.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --require co-mocha **/*.spec.js",
+    "test": "mocha --require co-mocha *.spec.js **/*.spec.js",
     "validate-commit-msg": "validate-commit-msg",
     "semantic-release": "semantic-release"
   },
@@ -31,5 +31,8 @@
     "semantic-release": "16.0.1",
     "sinon": "8.0.4",
     "validate-commit-message": "3.0.1"
+  },
+  "dependencies": {
+    "node-cache": "5.1.0"
   }
 }

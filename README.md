@@ -8,29 +8,30 @@ To get started just require the lib and create an instance right away.
 
 ```js
 const crypto = require('crypto');
-const ecrypto = require('@emartech/easy-crypto')();
+const easyCrypto = require('@emartech/easy-crypto');
 
 const password = crypto.randomBytes(24).toString('hex');
 const randomData = crypto.randomBytes(1024).toString('hex');
 
+const ecrypto = easyCrypto(password);
+
 async function exampleAsyncFunction() {
-    const encrypted = await ecrypto.encrypt(password, randomData);
-    const decrypted = await ecrypto.decrypt(password, encrypted);
+    const encrypted = await ecrypto.encrypt(randomData);
+    const decrypted = await ecrypto.decrypt(encrypted);
     randomData === decrypted; //true
 }
-
 ```
 
 ## Advanced usage (Use for performance)
-[Key derivation](https://en.wikipedia.org/wiki/Key_derivation_function) is a resource heavy process. The simple interface abstracts this away and forces you to recompute the key before each encryption/decryption process. 
+[Key derivation](https://en.wikipedia.org/wiki/Key_derivation_function) is a resource heavy process. The default settings recompute the key before each encryption/decryption process. 
 
-This interface allows you to cache the result of the key derivation. This is required if you need to encrypt/decrypt multiple times with the same derived key. Caching the key saves you the time to have to recompute it before every encryption/decryption.
+These options allow you to cache the result of the key derivation. This is required if you need to encrypt/decrypt multiple times with the same derived key. Caching the keys with [node-cache](https://github.com/node-cache/node-cache) saves you the time to have to recompute it before every encryption/decryption.
 
 To get started just require the lib and create an instance right away.
 
 ```js
 const crypto = require('crypto');
-const ecrypto = require('@emartech/easy-crypto')();
+const easyCrypto = require('@emartech/easy-crypto');
 
 const password = crypto.randomBytes(24).toString('hex');
 const randomData = [
@@ -39,64 +40,51 @@ const randomData = [
     crypto.randomBytes(1024).toString('hex')
 ];
 
-async function example(password, data) {
-    const salt = await ecrypto.generateSalt();
-    const key = await ecrypto.generateKey(password, salt);
+const ecrypto = easyCrypto(password, {
+  encryptCacheTtl: 3600,
+  decryptCachePoolSize: 100,
+});
+
+async function exampleAsyncFunction() {
     const encrypted = await Promise.all(
-        data.map(item => ecrypto.encryptWithKey(key, item))
+        randomData.map(item => ecrypto.encrypt(item))
     );
 
-    const saltFromEncrypted = ecrypto.getSaltFromEncrypted(encrypted[0]);
-    const keyForDecryption = await ecrypto.generateKey(password, saltFromEncrypted);
     const decrypted = await Promise.all(
-        encrypted.map(item => ecrypto.decryptWithKey(keyForDecryption, item))
+        encrypted.map(item => ecrypto.decrypt(item))
     );
     
     return data.reduce((allValid, item, index) => {
         return allValid && item === decrypted[index];
     }, true);
 }
-
-example(password, randomData);
-
 ```
-
 
 ## Interface
 
 ### Initialization
-There aren't too many options you can change and that is on purpose. This small wrapper library is secure by default. You can change two configurations: `passwordSaltSize`, `iterationCount` by passing them to the initialization function as follows:
+There aren't too many options you can change and that is on purpose. This small wrapper library is secure by default. You can change two configurations: `encryptCacheTtl`, `decryptCachePoolSize` by passing them to the initialization function as follows:
 ```js
-let ecrypto = require('easy-crypto')(12, 10000); // parameters are in order: passwordSaltSize, iterationCount
+let ecrypto = require('@emartech/easy-crypto')('password', {
+  encryptCacheTtl: 3600,
+  decryptCachePoolSize: 100,
+});
 ```
-The default value for `passwordSaltSize` is 12 `bytes`, for `iterationCount` it is 10k `iterations`.
 
-#### `passwordSaltSize`
-The size of the random data used to generate the encryption key. This value is in `bytes`.
+#### `password`
+`password` should be any normal string. It will be used to generate the encryption key.
 
-#### `iterationCount`
-The iteration count used to generate the encryption key.
+#### `encryptCacheTtl`
+Time in seconds while the same key is reused during encryption. Must be an integer.
 
-### encrypt(`password`, `plaintext`) -> `ciphertext`
-`password` should be any normal string. It will be used to generate the encryption key. `plaintext` must be `utf-8` encoded string. It will be "converted" to `bytes` and those will be used for the cryptographic operations. The output of this operations is `base64` encoded buffers. This will be used as the input of the `decrypt` operation. This return value is a `Promise`.
+#### `decryptCachePoolSize`
+Maximum number of keys kept in the cache during decryption. Must be an integer.
 
-### decrypt(`password`, `ciphertext`) -> `plaintext`
-`password` should be any normal string. It will be used to generate the encryption key. `ciphertext` must be the output of the `encrypt` method. The library is not compatible with any other encryption library out of the box! The output of this operation is the original `utf-8` encoded string. This return value is a `Promise`.
+### encrypt(`plaintext`) -> `ciphertext`
+`plaintext` must be `utf-8` encoded string. It will be "converted" to `bytes` and those will be used for the cryptographic operations. The output of this operations is `base64` encoded buffers. This will be used as the input of the `decrypt` operation. This return value is a `Promise`.
 
-### encryptWithKey(`key`, `plaintext`) -> `ciphertext`
-`key` is an object returned by `generateKey`. `plaintext` must be `utf-8` encoded string. It will be "converted" to `bytes` and those will be used for the cryptographic operations. The output of this operations is `base64` encoded buffers. This will be used as the input of the `decryptWithKey` operation. This return value is a `Promise`.
-
-### decryptWithKey(`key`, `ciphertext`) -> `plaintext`
-`key` is an object returned by `generateKey`. `ciphertext` must be the output of the `encrypt` method. The library is not compatible with any other encryption library out of the box! The output of this operation is the original `utf-8` encoded string. This return value is a `Promise`.
-
-### generateKey(`password`, `salt`) -> `key`
-`password` should be any normal string. It will be used to generate the encryption key. `salt` is the buffer returned by `generateSalt` or `getSaltFromEncrypted`. These values will be used to derive a `key`.
-
-### generateSalt() -> `salt`
-Generates a random buffer of `passwordSaltSize` bytes. Returns a `Promise` which resolves to a `Buffer`.
-
-### getSaltFromEncrypted(`ciphertext`) -> `salt`
-Extracts the `salt` used for deriving the `key` which can be used to decrypt the `ciphertext`. Returns a `Buffer`.
+### decrypt(`ciphertext`) -> `plaintext`
+`ciphertext` must be the output of the `encrypt` method. The library is not compatible with any other encryption library out of the box! The output of this operation is the original `utf-8` encoded string. This return value is a `Promise`.
 
 ## The crypto parts
 The library is only a thin wrapper of node's own `crypto` module. It uses well known and battle tested encryption techniques. It provides a convenient wrapper around these functions, taking away the details of using encryption correctly. Feel free to explore the source!
