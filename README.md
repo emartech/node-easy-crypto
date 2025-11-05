@@ -1,4 +1,5 @@
-# node-easy-crypto [ ![Codeship Status for emartech/node-easy-crypto](https://codeship.com/projects/0baf8660-f4ea-0133-b502-5ef57cbd419a/status?branch=master)](https://codeship.com/projects/150193) [![Depedencies](https://david-dm.org/emartech/node-easy-crypto.svg)](https://david-dm.org/emartech/node-easy-crypto) [![Dev depedencies](https://david-dm.org/emartech/node-easy-crypto/dev-status.svg)](https://david-dm.org/emartech/node-easy-crypto#info=devDependencies&view=table)
+# node-easy-crypto 
+
 Provides simple wrappers around Node's crypto implementation. The library provides two interfaces: simple and advanced. Simple mode is designed for ease-of-use and advanced mode provides some performance benefits in certain use-cases. See below for more details.
 
 All the underlying crypto operations are the same.
